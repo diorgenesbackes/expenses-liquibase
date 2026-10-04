@@ -1,0 +1,152 @@
+databaseChangeLog:
+  - changeSet:
+      id: sprint-1-001
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/001-create-schemas.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: rollback/001-create-schemas.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+
+  - changeSet:
+      id: sprint-1-002
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/002-create-identity.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: rollback/002-create-identity.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+
+  - changeSet:
+      id: sprint-1-003
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/003-create-household.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: rollback/003-create-household.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+
+  - changeSet:
+      id: sprint-1-004
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/004-create-finance.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: rollback/004-create-finance.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+
+  - changeSet:
+      id: sprint-1-005
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/005-create-income.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: rollback/005-create-income.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+
+  - changeSet:
+      id: sprint-1-006
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/006-create-closings.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: rollback/006-create-closings.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+
+  - changeSet:
+      id: sprint-1-007
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/007-create-operations.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: rollback/007-create-operations.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+
+  - changeSet:
+      id: sprint-1-008
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/008-create-integrity-guards.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: false
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: rollback/008-create-integrity-guards.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
