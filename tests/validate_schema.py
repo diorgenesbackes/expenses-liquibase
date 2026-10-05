@@ -21,7 +21,7 @@ def execute(args, **kwargs):
 
 def main():
     config = {}
-    env_file = PROJECT.parent / '.env'
+    env_file = PROJECT.parent / 'expenses-infrastructure' / '.env'
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             if line.strip() and not line.lstrip().startswith('#'):
@@ -30,7 +30,7 @@ def main():
     username = os.environ.get('LIQUIBASE_COMMAND_USERNAME', config.get('POSTGRES_USER', 'admin'))
     password = os.environ.get('LIQUIBASE_COMMAND_PASSWORD', config.get('POSTGRES_PASSWORD'))
     if not password:
-        raise RuntimeError('Configure LIQUIBASE_COMMAND_PASSWORD or POSTGRES_PASSWORD in .env.')
+        raise RuntimeError('Configure LIQUIBASE_COMMAND_PASSWORD in the environment or POSTGRES_PASSWORD in expenses-infrastructure/.env.')
     env = os.environ.copy()
     env.update(LIQUIBASE_COMMAND_USERNAME=username, LIQUIBASE_COMMAND_PASSWORD=password,
                LIQUIBASE_COMMAND_URL=f'jdbc:postgresql://127.0.0.1:5432/{DB_NAME}')
