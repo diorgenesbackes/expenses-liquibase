@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: sprint-3-001
+      author: expenses
+      dbms: postgresql
+      runInTransaction: true
+      changes:
+        - sqlFile:
+            path: sql/001-create-sessions.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true
+      rollback:
+        - sqlFile:
+            path: rollback/001-create-sessions.sql
+            relativeToChangelogFile: true
+            encoding: UTF-8
+            splitStatements: true

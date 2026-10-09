@@ -2,3 +2,9 @@ databaseChangeLog:
   - include:
       file: changelogs/sprint-1/changelog.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changelogs/sprint-2/changelog.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/sprint-3/changelog.yaml
+      relativeToChangelogFile: true

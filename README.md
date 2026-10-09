@@ -1,6 +1,6 @@
 # expenses-liquibase
 
-Migrações PostgreSQL do Expenses, com changelogs YAML e scripts SQL separados de seus rollbacks. A sprint-1 cria **33 tabelas em quatro schemas**, com PKs, FKs, unicidade, checks, índices e triggers de integridade.
+Migrações PostgreSQL do Expenses, com changelogs YAML e scripts SQL separados de seus rollbacks. A sprint-1 cria **33 tabelas em quatro schemas** e a sprint-2 adiciona o diário de cadastro (total com sprint-3: **36 tabelas e dez changesets**), com PKs, FKs, unicidade, checks, índices e triggers de integridade.
 
 As fontes, relações, premissas e responsabilidades do backend estão no [modelo físico](../expenses-docs/db/DB-Modelo-Fisico.md). O SQL versionado é o dicionário de campos, tipos e constraints.
 
@@ -16,11 +16,10 @@ expenses-liquibase/
 │       ├── sql/
 │       └── rollback/
 └── tests/
-    ├── validate_schema.py
-    └── schema_checks.sql
+    └── validate_schema.py  # encaminha para expenses-tests/scripts/schema.py
 ```
 
-O master referencia o changelog da sprint-1, com os seguintes changeSets:
+O master referencia os changelogs da sprints 1, 2 e 3, com os seguintes changeSets:
 
 | ChangeSet | Conteúdo |
 | --- | --- |
@@ -32,6 +31,8 @@ O master referencia o changelog da sprint-1, com os seguintes changeSets:
 | `sprint-1-006` | Versões de fechamento e snapshots de rateio. |
 | `sprint-1-007` | Importações, mapeamentos de origem, exportações, revisões, idempotência e auditoria financeira. |
 | `sprint-1-008` | Triggers de integridade e proteção de histórico. |
+| `sprint-2-001` | Diário de cadastro, reserva de e-mail, vínculo à idempotência e etapas de recuperação. |
+| `sprint-3-001` | Sessões/revogação e coordenação de login; tentativas passam a admitir IP nulo. |
 
 Cada changeSet é transacional. O arquivo de funções usa `splitStatements: false` para preservar os blocos PL/pgSQL. Os rollbacks removem os objetos na ordem inversa das dependências, sem `CASCADE`. Depois de uma aplicação compartilhada, evolua o modelo com novos changeSets; preserve os existentes e seus checksums.
 
@@ -78,16 +79,25 @@ Com Python 3, Liquibase e o container `expenses-postgres` em execução no conte
 python3 tests/validate_schema.py
 ```
 
-O teste usa as variáveis Liquibase ou as credenciais de `expenses-infrastructure/.env`. Cria um banco com nome aleatório `expenses_sprint1_check_*`, executa `validate`, `update`, reaplicação sem mudanças, testes SQL, rollback dos oito changeSets e nova aplicação. Remove somente esse banco temporário ao terminar. O banco `expenses` não recebe as migrações durante esse teste.
+O teste usa as variáveis Liquibase ou as credenciais de `expenses-infrastructure/.env`. Cria um banco com nome aleatório `expenses_sprint1_check_*`, executa `validate`, aplica os oito changesets antigos, insere usuário de upgrade, aplica os dois novos, verifica reaplicação e testes SQL, reverte/reaplica sprints 2/3 preservando o usuário e executa rollback dos dez changesets seguido de nova aplicação. Remove somente esse banco temporário ao terminar. O banco `expenses` não recebe as migrações durante esse teste.
 
 Os cenários verificam chaves entre casas e competências, unicidade, valores inválidos, participantes, administrador obrigatório, reconfirmação de pagamento, idempotência, período fechado, preservação dos fechamentos e cobertura de índices para todas as FKs. Usam dados sintéticos; não implementam nem validam o algoritmo de rateio, a autorização HTTP ou o importador legado.
 
 ## Rollback
 
-No banco configurado, imediatamente após esta sprint e sem changeSets posteriores:
+A reversão mais recente (`rollback-count --count=1`) remove sessions/login_guards
+**e seus dados**. O rollback da sprint-3 mantém ip_hash nullable, pois restaurar
+NOT NULL exigiria apagar histórico ou inventar IP. Use somente em banco descartável
+ou manutenção com plano explícito; a reversão de aplicação deve preservar registros
+de sessão, revogação e cadastro. O ciclo completo foi validado em banco temporário.
 
-```bash
-liquibase --defaults-file=config/liquibase.properties rollback-count --count=8
-```
+A validação aplica os oito changesets antigos, preserva um usuário de upgrade,
+aplica até o décimo, testa constraints, reverte/reaplica sprints 2/3 e depois os
+dez changesets. Reaplicar reconstrói 36 tabelas. O banco expenses não é modificado.
 
-Esse comando remove as tabelas da sprint **e seus dados**. Foi validado no banco temporário. Em bases com dados a preservar, a evolução normal deve usar novas migrações.
+Consulte [operação do cadastro](../expenses-docs/fdd/FDD-Criacao-Usuario-Autenticacao/4-operacao.md) e
+[operação das sessões](../expenses-docs/fdd/FDD-Criacao-Usuario-Autenticacao/2-desenvolvimento.md#login-e-sessoes-e3-e4).
+
+### Projeto de testes separado
+
+Os SQLs de verificação e a orquestração do ciclo completo foram movidos para `expenses-tests/integration/schema` e `expenses-tests/scripts/schema.py`. O comando `python3 tests/validate_schema.py` permanece como encaminhamento. Agora é criado um container PostgreSQL privado por execução; não são lidas credenciais nem utilizados os dados do desenvolvimento. Changelogs e SQLs de produção permanecem exclusivamente neste projeto.
